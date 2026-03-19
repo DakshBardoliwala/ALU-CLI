@@ -8,7 +8,6 @@ const SKILL_CONTENT: &str = include_str!("../SKILL.md");
 
 #[derive(Parser)]
 #[command(name = "alu")]
-#[command(version = "1.0.0")]
 #[command(about = "Agent Logic Unit CLI", long_about = None)]
 struct Cli {
     #[command(subcommand)]

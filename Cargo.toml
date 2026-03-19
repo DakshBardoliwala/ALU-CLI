@@ -2,6 +2,14 @@
 name = "alu"
 version = "0.1.0"
 edition = "2024"
+description = "Agent Logic Unit — deterministic math evaluation CLI for AI agents"
+license = "Apache-2.0"
+repository = "https://github.com/DakshBardoliwala/ALU-CLI"
+homepage = "https://github.com/DakshBardoliwala/ALU-CLI"
+documentation = "https://github.com/DakshBardoliwala/ALU-CLI#readme"
+readme = "README.md"
+keywords = ["math", "agent", "cli", "eval", "llm"]
+categories = ["command-line-utilities", "mathematics", "development-tools"]
 
 [dependencies]
 anyhow = "1.0.102"
