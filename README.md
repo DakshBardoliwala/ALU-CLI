@@ -2,27 +2,66 @@
 
 **Agent Logic Unit** — a lightweight CLI tool for high-speed, deterministic math evaluation. Built so AI agents (Claude, Codex, and others) can offload arithmetic to a reliable evaluator instead of hallucinating results.
 
+[![Crates.io](https://img.shields.io/crates/v/alu.svg)](https://crates.io/crates/alu)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![CI](https://github.com/DakshBardoliwala/ALU-CLI/workflows/CI/badge.svg)](https://github.com/DakshBardoliwala/ALU-CLI/actions)
+
 ## Why
 
 LLMs are unreliable at precise arithmetic. ALU-CLI is designed to be invoked as a **skill** by AI agents — giving them a trustworthy math co-processor for real computations.
 
+| Metric | Agent + Python | Agent + ALU-CLI |
+|---|---|---|
+| **Startup Latency** | ~200–500ms | **< 5ms** |
+| **User Friction** | Requires "Y/n" approval | **Zero-touch (pre-authorized)** |
+| **Dependencies** | Python runtime + libraries | **Zero (standalone binary)** |
+| **Determinism** | Potential syntax/env errors | **Deterministic every time** |
+
 ## Install
 
+**Quickest — no installation required:**
 ```bash
-git clone https://github.com/your-username/alu-cli
-cd alu-cli
-cargo build --release
-# Add to PATH
-cp target/release/alu /usr/local/bin/alu
+npx alu init
 ```
 
-Then register it as an agent skill:
-
+**macOS (Homebrew):**
 ```bash
+brew install DakshBardoliwala/tap/alu
 alu init
 ```
 
-This installs `SKILL.md` into `~/.claude/skills/alu/`, `~/.codex/skills/alu/`, and `~/.agents/skills/alu/`, and adds `Bash(alu *)` to the agent permission allowlists in their respective `settings.json` files.
+**macOS / Linux (shell installer):**
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/DakshBardoliwala/ALU-CLI/releases/latest/download/alu-installer.sh | sh
+alu init
+```
+
+**Windows (PowerShell):**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://github.com/DakshBardoliwala/ALU-CLI/releases/latest/download/alu-installer.ps1 | iex"
+alu init
+```
+
+**Rust developers:**
+```bash
+cargo install alu
+alu init
+```
+
+## Agent Integration
+
+Running `alu init` does two things automatically:
+
+1. **Installs the skill** — writes `SKILL.md` into `.claude/skills/alu/`, `.codex/skills/alu/`, and `.agents/skills/alu/` so agents can discover ALU on startup
+2. **Pre-authorizes the command** — patches `settings.json` to add `Bash(alu *)` to the allow list, so agents invoke ALU without prompting you for approval on every call
+
+By default, skills are installed globally into your home directory. To install into a specific project instead:
+
+```bash
+alu init ./my-project
+```
+
+The result: agents gain a zero-friction math co-processor with no manual configuration required.
 
 ## Usage
 
@@ -63,16 +102,6 @@ alu eval "cos(pi) + tan(pi/4)"
 | Exponential | `exp`, `ln`, `sqrt` |
 | Rounding | `ceil`, `floor`, `abs` |
 | Constants | `pi`, `e` |
-
-## Agent Integration
-
-After running `alu init`, agents can discover and invoke ALU as a skill. Claude, for example, will find the skill definition at `~/.claude/skills/alu/SKILL.md` and use `alu eval` for any arithmetic it would otherwise compute inline.
-
-The `init` command also patches `settings.json` to pre-authorize `Bash(alu *)`, so agents don't need to prompt for approval on each invocation.
-
-## Requirements
-
-- Rust 1.94+
 
 ## License
 

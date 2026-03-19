@@ -23,7 +23,10 @@ enum Commands {
         expression: String,
     },
     /// Automatically install ALU as a skill for Claude and Codex
-    Init,
+    Init {
+        /// Install into a specific directory instead of the global home directory
+        directory: Option<std::path::PathBuf>,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
@@ -34,21 +37,32 @@ fn main() -> anyhow::Result<()> {
             let result = math::eval(&expression)?;
             println!("Result: {}", result);
         }
-        Commands::Init => {
-            install_skills()?;
+        Commands::Init { directory } => {
+            install_skills(directory)?;
         }
     }
 
     Ok(())
 }
 
-fn install_skills() -> anyhow::Result<()> {
-    let home = dirs::home_dir().ok_or_else(|| anyhow::anyhow!("Could not find home directory"))?;
+fn install_skills(directory: Option<std::path::PathBuf>) -> anyhow::Result<()> {
+    let base = match directory {
+        Some(dir) => {
+            if !dir.exists() {
+                anyhow::bail!("Directory does not exist: {}", dir.display());
+            }
+            if !dir.is_dir() {
+                anyhow::bail!("Path is not a directory: {}", dir.display());
+            }
+            dir
+        }
+        None => dirs::home_dir().ok_or_else(|| anyhow::anyhow!("Could not find home directory"))?,
+    };
 
     let paths = vec![
-        home.join(".claude/"),
-        home.join(".codex/"),
-        home.join(".agents/"),
+        base.join(".claude/"),
+        base.join(".codex/"),
+        base.join(".agents/"),
     ];
 
     for path in paths {
