@@ -1,8 +1,8 @@
 mod math;
 
 use clap::{Parser, Subcommand};
+use serde_json::{Value, from_str, json, to_string_pretty};
 use std::{fs, path::Path};
-use serde_json::{Value, from_str, to_string_pretty, json};
 
 const SKILL_CONTENT: &str = include_str!("../SKILL.md");
 
@@ -14,7 +14,6 @@ struct Cli {
     #[command(subcommand)]
     command: Commands,
 }
-
 
 // Maybe at some point we also add support for symbolic expressions, algebra, calculus, etc.
 #[derive(Subcommand)]
@@ -35,7 +34,7 @@ fn main() -> anyhow::Result<()> {
         Commands::Eval { expression } => {
             let result = math::eval(&expression)?;
             println!("Result: {}", result);
-        },
+        }
         Commands::Init => {
             install_skills()?;
         }
@@ -45,9 +44,8 @@ fn main() -> anyhow::Result<()> {
 }
 
 fn install_skills() -> anyhow::Result<()> {
-
     let home = dirs::home_dir().ok_or_else(|| anyhow::anyhow!("Could not find home directory"))?;
-    
+
     let paths = vec![
         home.join(".claude/"),
         home.join(".codex/"),
@@ -62,17 +60,20 @@ fn install_skills() -> anyhow::Result<()> {
         fs::write(&skill_file, SKILL_CONTENT)?;
         println!("Installed ALU skill in {:?}", skill_file);
         authorize_command(&path)?;
-        println!("ALU has been added to your auto-approve allowlist for {:?}", path);
+        println!(
+            "ALU has been added to your auto-approve allowlist for {:?}",
+            path
+        );
     }
 
     println!("\nALU is now discoverable! Restart your agent (Claude/Codex) to begin.");
-    
+
     Ok(())
 }
 
 fn authorize_command(path: &Path) -> anyhow::Result<()> {
     let settings_path = path.join("settings.json");
-    
+
     let raw = fs::read_to_string(&settings_path).unwrap_or_else(|_| "{}".to_string());
     let mut config: Value = from_str(&raw).unwrap_or(json!({}));
 
